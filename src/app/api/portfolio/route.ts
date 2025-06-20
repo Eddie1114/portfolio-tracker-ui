@@ -8,7 +8,7 @@ export async function GET() {
     const res = await fetch(BACKEND_URL);
     const data = await res.json();
     return NextResponse.json(data, { status: res.status });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch portfolio items from backend' },
       { status: 500 }
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     });
     const data = await res.json();
     return NextResponse.json(data, { status: res.status });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to add portfolio item to backend' },
       { status: 500 }

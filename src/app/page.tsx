@@ -23,9 +23,9 @@ export default function Home() {
       setError(null);
       try {
         const res = await fetch("/api/portfolio");
-        const data = await res.json();
-        setPortfolio(Array.isArray(data) ? data : []);
-      } catch (err) {
+        const result = await res.json();
+        setPortfolio(Array.isArray(result) ? result : []);
+      } catch {
         setError("Failed to load portfolio");
       } finally {
         setLoading(false);
@@ -59,13 +59,10 @@ export default function Home() {
       }
       setForm({ asset: "", quantity: "", price: "" });
       // Re-fetch portfolio
-      const data = await res.json();
-      // Optionally, you can re-fetch the whole list or just append
-      // For now, re-fetch the list
       const updatedRes = await fetch("/api/portfolio");
       const updatedData = await updatedRes.json();
       setPortfolio(Array.isArray(updatedData) ? updatedData : []);
-    } catch (err) {
+    } catch {
       setError("Failed to add asset");
     } finally {
       setSubmitting(false);
