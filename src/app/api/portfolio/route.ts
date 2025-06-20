@@ -1,62 +1,35 @@
 import { NextResponse } from 'next/server';
-import { MongoClient, ObjectId } from 'mongodb';
 
-// Initialize MongoDB client
-const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri || '');
+const BACKEND_URL = 'https://portfolio-tracker-ox9i.onrender.com/api/portfolio';
 
-// Helper function to connect to database
-async function connectToDatabase() {
-  if (!client.connect) {
-    await client.connect();
-  }
-  return client.db('portfolio-tracker');
-}
-
-// GET /api/portfolio - Get all portfolio items
+// GET /api/portfolio - Proxy to backend
 export async function GET() {
   try {
-    const db = await connectToDatabase();
-    const collection = db.collection('portfolio');
-    const items = await collection.find({}).toArray();
-    
-    return NextResponse.json(items);
+    const res = await fetch(BACKEND_URL);
+    const data = await res.json();
+    return NextResponse.json(data, { status: res.status });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to fetch portfolio items' },
+      { error: 'Failed to fetch portfolio items from backend' },
       { status: 500 }
     );
   }
 }
 
-// POST /api/portfolio - Add a new portfolio item
+// POST /api/portfolio - Proxy to backend
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { asset, quantity, purchasePrice } = body;
-
-    if (!asset || !quantity || !purchasePrice) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
-    }
-
-    const db = await connectToDatabase();
-    const collection = db.collection('portfolio');
-    
-    const result = await collection.insertOne({
-      asset,
-      quantity: Number(quantity),
-      purchasePrice: Number(purchasePrice),
-      createdAt: new Date(),
-      updatedAt: new Date(),
+    const res = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
     });
-
-    return NextResponse.json(result, { status: 201 });
+    const data = await res.json();
+    return NextResponse.json(data, { status: res.status });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to add portfolio item' },
+      { error: 'Failed to add portfolio item to backend' },
       { status: 500 }
     );
   }
